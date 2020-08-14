@@ -18,14 +18,46 @@ const createStore = () => {
       setPosts(state, posts) {
         state.posts = posts;
       },
+      addPost(state, addedPost) {
+        state.posts.push(addedPost);
+      },
+      editPost({ state }, editedPost) {
+        const postIndex = state.posts.findIndex(
+          (post) => post.id === editedPost.id
+        );
+        state.posts[postIndex] = editedPost;
+      },
     },
     actions: {
-      async nuxtServerInit({ commit, state }) {
+      async nuxtServerInit({ commit }) {
         const result = await axios.get(
           "https://takheer-the-blog.firebaseio.com/posts.json"
         );
-        commit("setPosts", Object.values(result.data));
+        const posts = [];
+        for (const key in result.data) {
+          posts.push({ ...result.data[key], id: key });
+        }
+        commit("setPosts", posts);
       },
+      addPost({ commit }, post) {
+        const createdPost = {
+          ...post,
+        };
+        return (
+          axios
+            .post(
+              "https://takheer-the-blog.firebaseio.com/posts.json",
+              createdPost
+            )
+            .then((result) => {
+              commit("addPost", { ...createdPost, id: result.data.name });
+              this.$router.push("/posts");
+            })
+            // eslint-disable-next-line no-console
+            .catch((e) => console.log(e))
+        );
+      },
+      editPost({ commit }, post) {},
     },
   });
 };

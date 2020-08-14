@@ -1,15 +1,16 @@
 <template>
   <v-container>
     <v-row>
-      {{ posts }}
       <v-col v-for="post in posts" :key="post.id" lg="6">
-        <v-card class="post-card d-flex" rounded>
-          <div class="pa-4 text-center mt-auto mx-auto">
-            <h2 class="grey--text text--lighten-2">
-              {{ post.title }}
-            </h2>
-          </div>
-        </v-card>
+        <nuxt-link :to="'posts/' + post.id">
+          <v-card class="post-card d-flex" rounded>
+            <div class="pa-4 text-center mt-auto mx-auto">
+              <h2 class="grey--text text--lighten-2">
+                {{ post.title }}
+              </h2>
+            </div>
+          </v-card>
+        </nuxt-link>
       </v-col>
     </v-row>
   </v-container>
@@ -23,7 +24,6 @@ export default {
   },
   computed: {
     posts() {
-      console.log(this.$store.getters.posts);
       return this.$store.getters.posts;
     },
   },

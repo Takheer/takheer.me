@@ -2,6 +2,7 @@
   <v-card class="pa-5">
     <v-form>
       <v-text-field v-model="title" label="Заголовок" outlined></v-text-field>
+      <v-text-field v-model="slug" label="Текст ссылки" outlined></v-text-field>
       <v-text-field
         v-model="thumbnail"
         label="Ссылка на фото"
@@ -17,14 +18,13 @@
   </v-card>
 </template>
 <script>
-import axios from "axios";
-
 export default {
   name: "Index",
   data() {
     return {
       title: "",
       text: "",
+      slug: "",
       thumbnail: "",
     };
   },
@@ -32,24 +32,14 @@ export default {
     submit() {
       const postData = {
         title: this.title,
+        slug: this.slug,
         text: this.text,
         thumbnail: this.thumbnail,
       };
       if (postData.text === "" || postData.title === "") return;
-      axios
-        .post("https://takheer-the-blog.firebaseio.com/posts.json", postData)
-        .then((result) => {
-          // eslint-disable-next-line no-console
-          console.log(result);
-          this.$router.push("/posts");
-        })
-        // eslint-disable-next-line no-console
-        .catch((e) => console.log(e))
-        .finally(() => {
-          this.title = "";
-          this.thumbnail = "";
-          this.text = "";
-        });
+      this.$store.dispatch("addPost", postData).then(() => {
+        this.$router.push("/posts");
+      });
     },
   },
 };
