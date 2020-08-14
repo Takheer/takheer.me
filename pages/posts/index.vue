@@ -1,0 +1,42 @@
+<template>
+  <v-container>
+    <v-row>
+      {{ posts }}
+      <v-col v-for="post in posts" :key="post.id" lg="6">
+        <v-card class="post-card d-flex" rounded>
+          <div class="pa-4 text-center mt-auto mx-auto">
+            <h2 class="grey--text text--lighten-2">
+              {{ post.title }}
+            </h2>
+          </div>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script>
+export default {
+  name: "Index",
+  data() {
+    return {};
+  },
+  computed: {
+    posts() {
+      console.log(this.$store.getters.posts);
+      return this.$store.getters.posts;
+    },
+  },
+};
+</script>
+
+<style scoped lang="scss">
+.post-card {
+  height: 400px;
+  cursor: pointer;
+  transition: transform ease-in-out 0.2s;
+  &:hover {
+    transform: scale(1.02);
+  }
+}
+</style>
