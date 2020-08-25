@@ -3,7 +3,7 @@
 <script>
 export default {
   name: "Index",
-  middleware: ["auth"],
+  middleware: ["check-auth", "auth"],
 };
 </script>
 

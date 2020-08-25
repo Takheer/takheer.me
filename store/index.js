@@ -1,5 +1,6 @@
 import Vuex from "vuex";
 import Vue from "vue";
+import Cookie from "js-cookie";
 
 Vue.use(Vuex);
 
@@ -8,6 +9,7 @@ const createStore = () => {
     state: {
       posts: [],
       token: "",
+      expiry: null,
     },
     getters: {
       posts(state) {
@@ -32,6 +34,9 @@ const createStore = () => {
       },
       setToken(state, token) {
         state.token = token;
+      },
+      clearToken(state) {
+        state.token = "";
       },
     },
     actions: {
@@ -84,6 +89,17 @@ const createStore = () => {
           )
           .then((result) => {
             commit("setToken", result.idToken);
+            localStorage.setItem("token", result.idToken);
+            localStorage.setItem(
+              "tokenExpiration",
+              new Date().getTime() + result.expiresIn * 1000
+            );
+            Cookie.set("jwt", result.idToken);
+            Cookie.set(
+              "expirationDate",
+              new Date().getTime() + result.expiresIn * 1000
+            );
+            dispatch("setLogoutTimer", result.expiresIn * 1000);
           })
           .catch((e) => {
             if (e.message === "EMAIL_EXISTS") {
@@ -93,6 +109,38 @@ const createStore = () => {
               // ...
             }
           });
+      },
+      setLogoutTimer({ commit }, duration) {
+        setTimeout(() => {
+          commit("clearToken");
+        }, duration);
+      },
+      initAuth({ commit, dispatch }, req) {
+        let token;
+        let expirationDate;
+        if (req) {
+          if (!req.headers.cookie) {
+            return;
+          }
+          const cookies = req.headers.cookie.split(";");
+          const jwtCookie = cookies.find((c) => c.trim().startsWith("jwt="));
+          if (!jwtCookie) {
+            return;
+          }
+          token = jwtCookie.split("=")[1];
+          expirationDate = cookies.find((c) =>
+            c.trim().startsWith("expirationDate=")
+          ).split[1];
+        } else {
+          token = localStorage.getItem("token");
+          expirationDate = localStorage.getItem("tokenExpiration");
+
+          if (new Date().getTime() > +expirationDate || !token) {
+            return;
+          }
+        }
+        dispatch("setLogoutTimer", +expirationDate - new Date());
+        commit("setToken", token);
       },
     },
   });
