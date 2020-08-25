@@ -8,6 +8,7 @@ import AdminForm from "../../../components/Admin/AdminForm";
 export default {
   name: "Index",
   components: { AdminForm },
+  middleware: ["auth"],
 };
 </script>
 

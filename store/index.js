@@ -13,6 +13,9 @@ const createStore = () => {
       posts(state) {
         return state.posts;
       },
+      isAuthenticated(state) {
+        return state.token.length > 0;
+      },
     },
     mutations: {
       setPosts(state, posts) {
@@ -44,7 +47,6 @@ const createStore = () => {
         const createdPost = {
           ...post,
         };
-        console.log("state", state);
         return (
           this.$axios
             .$post("posts.json?auth=" + state.token, createdPost)
