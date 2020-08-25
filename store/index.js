@@ -7,6 +7,7 @@ const createStore = () => {
   return new Vuex.Store({
     state: {
       posts: [],
+      token: "",
     },
     getters: {
       posts(state) {
@@ -26,6 +27,9 @@ const createStore = () => {
         );
         state.posts[postIndex] = editedPost;
       },
+      setToken(state, token) {
+        state.token = token;
+      },
     },
     actions: {
       async nuxtServerInit({ commit }, { app }) {
@@ -36,13 +40,14 @@ const createStore = () => {
         }
         commit("setPosts", posts);
       },
-      addPost({ commit }, post) {
+      addPost({ commit, state }, post) {
         const createdPost = {
           ...post,
         };
+        console.log("state", state);
         return (
           this.$axios
-            .$post("posts.json", createdPost)
+            .$post("posts.json?auth=" + state.token, createdPost)
             .then((data) => {
               commit("addPost", { ...createdPost, id: data.name });
               this.$router.push("/posts");
@@ -51,7 +56,42 @@ const createStore = () => {
             .catch((e) => console.log(e))
         );
       },
-      editPost({ commit }, post) {},
+      editPost({ commit, state }, post) {
+        this.$axios
+          .$put("posts/", post.id + ".json?auth=" + state.token)
+          .then(() => {
+            commit("editPost", post);
+            this.$router.push("/posts/" + post.id);
+          })
+          // eslint-disable-next-line no-console
+          .catch((e) => console.log(e));
+      },
+      authenticate({ commit, dispatch, state }, authData) {
+        const method = authData.isSignUp ? "signUp" : "signInWithPassword";
+        return this.$axios
+          .$post(
+            "https://identitytoolkit.googleapis.com/v1/accounts:" +
+              method +
+              "?key=" +
+              process.env.firebaseConfig.apiKey,
+            {
+              email: authData.email,
+              password: authData.password,
+              returnSecureToken: true,
+            }
+          )
+          .then((result) => {
+            commit("setToken", result.idToken);
+          })
+          .catch((e) => {
+            if (e.message === "EMAIL_EXISTS") {
+              dispatch("authenticate", { ...authData, isSignUp: false });
+            }
+            if (e.message === "EMAIL_NOT_FOUND") {
+              // ...
+            }
+          });
+      },
     },
   });
 };

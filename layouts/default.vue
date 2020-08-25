@@ -32,7 +32,7 @@
         <nuxt />
       </v-container>
     </v-main>
-    <v-footer :absolute="!fixed" app>
+    <v-footer :absolute="!fixed" app inset>
       <span>&copy; {{ new Date().getFullYear() }}</span>
     </v-footer>
   </v-app>
@@ -60,6 +60,16 @@ export default {
           icon: "mdi-information-outline",
           title: "About",
           to: "/about",
+        },
+        {
+          icon: "mdi-account",
+          title: "Log in",
+          to: "/admin/auth",
+        },
+        {
+          icon: "mdi-pencil",
+          title: "New post",
+          to: "/admin/new-post",
         },
       ],
       miniVariant: false,
