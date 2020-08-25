@@ -1,0 +1,17 @@
+.fade{
+  &-enter{
+    opacity: 0;
+    &-active{
+      transition: opacity 0.2s;
+    }
+  }
+
+  &-leave{
+    &-active{
+      transition: opacity 0.2s;
+    }
+    &-to{
+      opacity: 0;
+    }
+  }
+}

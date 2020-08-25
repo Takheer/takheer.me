@@ -38,7 +38,11 @@ export default {
   /*
    ** Global CSS
    */
-  css: [],
+  css: ["~assets/main.scss"],
+  pageTransition: {
+    name: "fade",
+    mode: "out-in",
+  },
   /*
    ** Plugins to load before mounting the App
    ** https://nuxtjs.org/guide/plugins
