@@ -6,14 +6,11 @@
 </template>
 
 <script>
-import axios from "axios";
 export default {
   name: "Index",
   async asyncData(context) {
-    const { data } = await axios.get(
-      "https://takheer-the-blog.firebaseio.com/posts/" +
-        context.params.id +
-        ".json"
+    const data = await context.app.$axios.$get(
+      "posts/" + context.params.id + ".json"
     );
     return { post: data };
   },

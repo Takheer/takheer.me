@@ -38,6 +38,9 @@ export default {
   /*
    ** Global CSS
    */
+  loading: {
+    color: "#2D80D5",
+  },
   css: ["~assets/main.scss"],
   pageTransition: {
     name: "fade",
@@ -72,7 +75,9 @@ export default {
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
    */
-  axios: {},
+  axios: {
+    baseURL: "https://takheer-the-blog.firebaseio.com/",
+  },
   /*
    ** vuetify module configuration
    ** https://github.com/nuxt-community/vuetify-module

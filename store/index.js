@@ -1,6 +1,5 @@
 import Vuex from "vuex";
 import Vue from "vue";
-import axios from "axios";
 
 Vue.use(Vuex);
 
@@ -29,13 +28,11 @@ const createStore = () => {
       },
     },
     actions: {
-      async nuxtServerInit({ commit }) {
-        const result = await axios.get(
-          "https://takheer-the-blog.firebaseio.com/posts.json"
-        );
+      async nuxtServerInit({ commit }, { app }) {
+        const data = await app.$axios.$get("posts.json");
         const posts = [];
-        for (const key in result.data) {
-          posts.push({ ...result.data[key], id: key });
+        for (const key in data) {
+          posts.push({ ...data[key], id: key });
         }
         commit("setPosts", posts);
       },
@@ -44,13 +41,10 @@ const createStore = () => {
           ...post,
         };
         return (
-          axios
-            .post(
-              "https://takheer-the-blog.firebaseio.com/posts.json",
-              createdPost
-            )
-            .then((result) => {
-              commit("addPost", { ...createdPost, id: result.data.name });
+          this.$axios
+            .$post("posts.json", createdPost)
+            .then((data) => {
+              commit("addPost", { ...createdPost, id: data.name });
               this.$router.push("/posts");
             })
             // eslint-disable-next-line no-console
