@@ -26,6 +26,11 @@
     </v-navigation-drawer>
     <v-app-bar :clipped-left="clipped" app>
       <v-toolbar-title v-text="title" />
+      <v-spacer />
+      <v-btn v-if="isAuthenticated" color="primary" @click="logOut"
+        >Log out</v-btn
+      >
+      <v-btn v-else color="primary" @click="logIn">Log in</v-btn>
     </v-app-bar>
     <v-main>
       <v-container>
@@ -62,11 +67,6 @@ export default {
           to: "/about",
         },
         {
-          icon: "mdi-account",
-          title: "Log in",
-          to: "/admin/auth",
-        },
-        {
           icon: "mdi-pencil",
           title: "New post",
           to: "/admin/new-post",
@@ -77,6 +77,20 @@ export default {
       rightDrawer: false,
       title: "Takheer.ru",
     };
+  },
+  computed: {
+    isAuthenticated() {
+      return this.$store.getters.isAuthenticated;
+    },
+  },
+  methods: {
+    logIn() {
+      this.$router.push("/admin/auth");
+    },
+    logOut() {
+      this.$store.dispatch("logout");
+      this.$router.push("/admin/auth");
+    },
   },
 };
 </script>

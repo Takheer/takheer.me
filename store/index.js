@@ -92,12 +92,12 @@ const createStore = () => {
             localStorage.setItem("token", result.idToken);
             localStorage.setItem(
               "tokenExpiration",
-              new Date().getTime() + result.expiresIn * 1000
+              new Date().getTime() + +result.expiresIn * 1000
             );
             Cookie.set("jwt", result.idToken);
             Cookie.set(
               "expirationDate",
-              new Date().getTime() + result.expiresIn * 1000
+              new Date().getTime() + +result.expiresIn * 1000
             );
             dispatch("setLogoutTimer", result.expiresIn * 1000);
           })
@@ -109,11 +109,6 @@ const createStore = () => {
               // ...
             }
           });
-      },
-      setLogoutTimer({ commit }, duration) {
-        setTimeout(() => {
-          commit("clearToken");
-        }, duration);
       },
       initAuth({ commit, dispatch }, req) {
         let token;
@@ -134,13 +129,22 @@ const createStore = () => {
         } else {
           token = localStorage.getItem("token");
           expirationDate = localStorage.getItem("tokenExpiration");
-
-          if (new Date().getTime() > +expirationDate || !token) {
-            return;
-          }
         }
-        dispatch("setLogoutTimer", +expirationDate - new Date());
+        if (new Date().getTime() > +expirationDate || !token) {
+          commit("clearToken");
+          dispatch("logout");
+          return;
+        }
         commit("setToken", token);
+      },
+      logout({ commit }) {
+        commit("clearToken");
+        Cookie.remove("jwt");
+        Cookie.remove("expirationDate");
+        if (process.client) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("tokenExpiration");
+        }
       },
     },
   });
