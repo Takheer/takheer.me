@@ -19,9 +19,7 @@
 <script>
 export default {
   name: "Index",
-  data() {
-    return {};
-  },
+  middleware: "log",
   computed: {
     posts() {
       return this.$store.getters.posts;
