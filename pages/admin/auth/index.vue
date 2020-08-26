@@ -62,7 +62,7 @@ export default {
           isSignUp,
         })
         .then(() => {
-          this.$router.push("/admin");
+          this.$router.push("/posts");
         });
     },
   },

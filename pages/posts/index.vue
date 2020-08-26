@@ -7,7 +7,7 @@
             <div class="d-flex flex-column w-100">
               <div v-if="isAuthenticated" class="d-flex flex-row pa-3">
                 <v-spacer />
-                <v-btn icon>
+                <v-btn icon @click="editPost(post)">
                   <v-icon>mdi-pencil</v-icon>
                 </v-btn>
                 <v-btn icon @click="deletePost(post)">
@@ -48,6 +48,9 @@ export default {
     ...mapActions({
       deletePost: "deletePost",
     }),
+    editPost(post) {
+      this.$router.push("/admin/" + post.id);
+    },
   },
 };
 </script>
