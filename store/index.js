@@ -99,7 +99,6 @@ const createStore = () => {
               "expirationDate",
               new Date().getTime() + +result.expiresIn * 1000
             );
-            dispatch("setLogoutTimer", result.expiresIn * 1000);
           })
           .catch((e) => {
             if (e.message === "EMAIL_EXISTS") {

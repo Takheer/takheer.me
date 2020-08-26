@@ -17,12 +17,15 @@
 </template>
 
 <script>
+import _ from "lodash";
 export default {
   name: "Index",
   middleware: "log",
   computed: {
     posts() {
-      return this.$store.getters.posts;
+      const posts = _.cloneDeep(this.$store.getters.posts);
+      posts.reverse();
+      return posts;
     },
   },
 };
