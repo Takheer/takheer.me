@@ -2,15 +2,27 @@
   <v-container>
     <v-row>
       <v-col v-for="post in posts" :key="post.id" lg="6">
-        <nuxt-link :to="'posts/' + post.id">
+        <a :to="'posts/' + post.id">
           <v-card class="post-card d-flex" rounded>
-            <div class="pa-4 text-center mt-auto mx-auto">
-              <h2 class="grey--text text--lighten-2">
-                {{ post.title }}
-              </h2>
+            <div class="d-flex flex-column w-100">
+              <div v-if="isAuthenticated" class="d-flex flex-row pa-3">
+                <v-spacer />
+                <v-btn icon>
+                  <v-icon>mdi-pencil</v-icon>
+                </v-btn>
+                <v-btn icon @click="deletePost(post)">
+                  <v-icon>mdi-trash-can</v-icon>
+                </v-btn>
+              </div>
+              <v-spacer />
+              <div class="pa-4 text-center mt-auto mx-auto">
+                <h2 class="grey--text text--lighten-2">
+                  {{ post.title }}
+                </h2>
+              </div>
             </div>
           </v-card>
-        </nuxt-link>
+        </a>
       </v-col>
     </v-row>
   </v-container>
@@ -18,15 +30,24 @@
 
 <script>
 import _ from "lodash";
+import { mapActions } from "vuex";
 export default {
   name: "Index",
   middleware: "log",
   computed: {
+    isAuthenticated() {
+      return this.$store.getters.isAuthenticated;
+    },
     posts() {
       const posts = _.cloneDeep(this.$store.getters.posts);
       posts.reverse();
       return posts;
     },
+  },
+  methods: {
+    ...mapActions({
+      deletePost: "deletePost",
+    }),
   },
 };
 </script>
@@ -39,5 +60,8 @@ export default {
   &:hover {
     transform: scale(1.02);
   }
+}
+.w-100 {
+  width: 100% !important;
 }
 </style>

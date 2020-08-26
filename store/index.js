@@ -26,11 +26,15 @@ const createStore = () => {
       addPost(state, addedPost) {
         state.posts.push(addedPost);
       },
-      editPost({ state }, editedPost) {
+      editPost(state, editedPost) {
         const postIndex = state.posts.findIndex(
           (post) => post.id === editedPost.id
         );
         state.posts[postIndex] = editedPost;
+      },
+      deletePost(state, post) {
+        const postIndex = state.posts.findIndex((p) => p.id === post.id);
+        state.posts.splice(postIndex, 1);
       },
       setToken(state, token) {
         state.token = token;
@@ -65,10 +69,20 @@ const createStore = () => {
       },
       editPost({ commit, state }, post) {
         this.$axios
-          .$put("posts/", post.id + ".json?auth=" + state.token)
+          .$put("posts/" + post.id + ".json?auth=" + state.token)
           .then(() => {
             commit("editPost", post);
             this.$router.push("/posts/" + post.id);
+          })
+          // eslint-disable-next-line no-console
+          .catch((e) => console.log(e));
+      },
+      deletePost({ commit, state }, post) {
+        this.$axios
+          .$delete("posts/" + post.id + ".json?auth=" + state.token)
+          .then(() => {
+            commit("deletePost", post);
+            this.$router.push("/posts");
           })
           // eslint-disable-next-line no-console
           .catch((e) => console.log(e));
