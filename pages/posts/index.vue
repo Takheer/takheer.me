@@ -1,11 +1,11 @@
 <template>
   <v-container>
     <v-row>
-      <v-col v-for="post in posts" :key="post.id" lg="6">
+      <v-col v-for="post in posts" :key="post.id" lg="12">
         <nuxt-link :to="'posts/' + post.id">
           <v-card class="post-card d-flex ma-4" rounded>
             <div class="d-flex flex-column w-100">
-              <div v-if="isAuthenticated" class="d-flex flex-row pa-3">
+              <!--div v-if="isAuthenticated" class="d-flex flex-row pa-3">
                 <v-spacer />
                 <v-btn icon>
                   <nuxt-link :to="/admin/ + post.id">
@@ -15,11 +15,15 @@
                 <v-btn icon @click="deletePost(post)">
                   <v-icon>mdi-trash-can</v-icon>
                 </v-btn>
-              </div>
+              </div-->
               <v-spacer />
-              <div class="pa-4 text-center mt-auto mx-auto">
-                <h2 class="grey--text text--lighten-2">
+              <div class="pa-4 text-left">
+                <h2>
                   {{ post.title }}
+                  <br />
+                  <small class="grey--text text--darken-2">{{
+                    answersCount
+                  }}</small>
                 </h2>
               </div>
             </div>
@@ -31,7 +35,7 @@
 </template>
 
 <script>
-import _ from "lodash";
+import { cloneDeep } from "lodash";
 import { mapActions } from "vuex";
 export default {
   name: "Index",
@@ -41,9 +45,14 @@ export default {
       return this.$store.getters.isAuthenticated;
     },
     posts() {
-      const posts = _.cloneDeep(this.$store.getters.posts);
+      const posts = cloneDeep(this.$store.getters.posts);
       posts.reverse();
       return posts;
+    },
+    answersCount() {
+      const prefix = "Нет";
+      const suffix = "ов";
+      return prefix + " ответ" + suffix;
     },
   },
   methods: {
@@ -59,7 +68,7 @@ export default {
 
 <style scoped lang="scss">
 .post-card {
-  height: 400px;
+  max-height: 250px;
   cursor: pointer;
   transition: transform ease-in-out 0.2s;
   &:hover {
