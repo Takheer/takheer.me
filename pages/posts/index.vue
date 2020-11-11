@@ -2,13 +2,15 @@
   <v-container>
     <v-row>
       <v-col v-for="post in posts" :key="post.id" lg="6">
-        <a :to="'posts/' + post.id">
-          <v-card class="post-card d-flex" rounded>
+        <nuxt-link :to="'posts/' + post.id">
+          <v-card class="post-card d-flex ma-4" rounded>
             <div class="d-flex flex-column w-100">
               <div v-if="isAuthenticated" class="d-flex flex-row pa-3">
                 <v-spacer />
-                <v-btn icon @click="editPost(post)">
-                  <v-icon>mdi-pencil</v-icon>
+                <v-btn icon>
+                  <nuxt-link :to="/admin/ + post.id">
+                    <v-icon>mdi-pencil</v-icon>
+                  </nuxt-link>
                 </v-btn>
                 <v-btn icon @click="deletePost(post)">
                   <v-icon>mdi-trash-can</v-icon>
@@ -22,7 +24,7 @@
               </div>
             </div>
           </v-card>
-        </a>
+        </nuxt-link>
       </v-col>
     </v-row>
   </v-container>
@@ -66,5 +68,8 @@ export default {
 }
 .w-100 {
   width: 100% !important;
+}
+a {
+  text-decoration: none !important;
 }
 </style>

@@ -1,7 +1,13 @@
 <template>
   <v-container>
-    <v-card-title class="display-2">{{ post.title }}</v-card-title>
-    <v-card-text>{{ post.text }}</v-card-text>
+    <v-card>
+      <v-card-title class="display-1">{{ post.title }}</v-card-title>
+      <v-card-text>
+        <p v-for="paragraph of post.text" :key="paragraph" class="post-body">
+          {{ paragraph }}
+        </p>
+      </v-card-text>
+    </v-card>
   </v-container>
 </template>
 
@@ -12,9 +18,14 @@ export default {
     const data = await context.app.$axios.$get(
       "posts/" + context.params.id + ".json"
     );
+    data.text = data.text.split("\n\n");
     return { post: data };
   },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.post-body {
+  font-size: 20px !important;
+}
+</style>
