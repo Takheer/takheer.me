@@ -1,6 +1,8 @@
 import Vuex from "vuex";
 import Vue from "vue";
 import Cookie from "js-cookie";
+import db from "../db/db";
+import firebaseConfig from "../db/firebaseConfig";
 
 Vue.use(Vuex);
 
@@ -10,6 +12,7 @@ const createStore = () => {
       posts: [],
       token: "",
       expiry: null,
+      currentUser: null,
     },
     getters: {
       posts(state) {
@@ -17,6 +20,9 @@ const createStore = () => {
       },
       isAuthenticated(state) {
         return state.token.length > 0;
+      },
+      currentUser(state) {
+        return state.currentUser;
       },
     },
     mutations: {
@@ -42,6 +48,12 @@ const createStore = () => {
       },
       clearToken(state) {
         state.token = "";
+      },
+      setCurrentUser(state, user) {
+        state.currentUser = user;
+      },
+      clearCurrentUser(state) {
+        state.currentUser = null;
       },
     },
     actions: {
@@ -72,7 +84,6 @@ const createStore = () => {
         this.$axios
           .$put("posts/" + post.id + ".json?auth=" + state.token, post)
           .then((data) => {
-            console.log(data);
             commit("editPost", data);
             this.$router.push("/posts");
           })
@@ -89,41 +100,59 @@ const createStore = () => {
           // eslint-disable-next-line no-console
           .catch((e) => console.log(e));
       },
-      authenticate({ commit, dispatch, state }, authData) {
+      async authenticate({ commit, dispatch, state }, authData) {
         const method = authData.isSignUp ? "signUp" : "signInWithPassword";
-        return this.$axios
-          .$post(
-            "https://identitytoolkit.googleapis.com/v1/accounts:" +
-              method +
-              "?key=" +
-              process.env.firebaseConfig.apiKey,
-            {
-              email: authData.email,
-              password: authData.password,
-              returnSecureToken: true,
-            }
-          )
-          .then((result) => {
-            commit("setToken", result.idToken);
-            localStorage.setItem("token", result.idToken);
-            localStorage.setItem(
-              "tokenExpiration",
-              new Date().getTime() + +result.expiresIn * 1000
-            );
-            Cookie.set("jwt", result.idToken);
-            Cookie.set(
-              "expirationDate",
-              new Date().getTime() + +result.expiresIn * 1000
-            );
-          })
-          .catch((e) => {
-            if (e.message === "EMAIL_EXISTS") {
-              dispatch("authenticate", { ...authData, isSignUp: false });
-            }
-            if (e.message === "EMAIL_NOT_FOUND") {
-              // ...
-            }
-          });
+        const data = {
+          email: authData.email,
+          password: authData.password,
+          returnSecureToken: true,
+        };
+        const userData = {
+          firstName: authData.firstName,
+          lastName: authData.lastName,
+          location: authData.location,
+          kennel: authData.kennel,
+          moderated: false,
+        };
+        const authResult = await this.$axios.$post(
+          "https://identitytoolkit.googleapis.com/v1/accounts:" +
+            method +
+            "?key=" +
+            firebaseConfig.apiKey,
+          data
+        );
+        commit("setToken", authResult.idToken);
+        let user;
+        if (authData.isSignUp) {
+          user = await db
+            .collection("users")
+            .doc(authResult.email)
+            .set(userData);
+          commit("setCurrentUser", userData);
+        } else {
+          user = await db.collection("users").doc(authResult.email).get();
+          // eslint-disable-next-line no-console
+          console.log(user.data());
+          commit("setCurrentUser", user.data());
+        }
+        localStorage.setItem("token", authResult.idToken);
+        localStorage.setItem(
+          "tokenExpiration",
+          new Date().getTime() + +authResult.expiresIn * 1000
+        );
+        Cookie.set("jwt", authResult.idToken);
+        Cookie.set(
+          "expirationDate",
+          new Date().getTime() + +authResult.expiresIn * 1000
+        );
+        // .catch((e) => {
+        //   if (e.message === "EMAIL_EXISTS") {
+        //     dispatch("authenticate", { ...authData, isSignUp: false });
+        //   }
+        //   if (e.message === "EMAIL_NOT_FOUND") {
+        //     // ...
+        //   }
+        // });
       },
       initAuth({ commit, dispatch }, req) {
         let token;
@@ -154,6 +183,7 @@ const createStore = () => {
       },
       logout({ commit }) {
         commit("clearToken");
+        commit("clearCurrentUser");
         Cookie.remove("jwt");
         Cookie.remove("expirationDate");
         if (process.client) {

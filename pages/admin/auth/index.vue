@@ -1,27 +1,28 @@
 <template>
   <v-card class="pa-5">
-    <v-card-title v-if="isSignUpMode">Create an account</v-card-title>
-    <v-card-title v-else>Sign in</v-card-title>
+    <v-card-title v-if="isSignUpMode">Создайте аккаунт</v-card-title>
+    <v-card-title v-else>Войдите в свой аккаунт</v-card-title>
     <v-form>
-      <v-text-field
-        v-model="email"
-        outlined
-        type="email"
-        label="e-mail"
-      ></v-text-field>
+      <v-text-field v-model="email" outlined type="email" label="e-mail" />
       <v-text-field
         v-model="password"
         outlined
         type="password"
-        label="password"
-      ></v-text-field>
+        label="Пароль"
+      />
+      <template v-if="isSignUpMode">
+        <v-text-field v-model="firstName" outlined label="Имя" />
+        <v-text-field v-model="lastName" outlined label="Фамилия" />
+        <v-text-field v-model="location" outlined label="Откуда вы" />
+        <v-text-field v-model="kennel" outlined label="Питомник" />
+      </template>
       <div class="d-flex flex-row">
         <v-btn @click="authenticate(isSignUpMode)">
           <template v-if="isSignUpMode">
-            sign up
+            Создать
           </template>
           <template v-else>
-            sign in
+            Войти
           </template>
         </v-btn>
         <v-alert v-if="errorMessage.length > 0" outlined>{{
@@ -30,12 +31,12 @@
       </div>
       <v-card-text>
         <small v-if="isSignUpMode">
-          Do you have an account already?
-          <a @click="isSignUpMode = false">Sign in it</a>
+          Уже есть аккаунт?
+          <a @click="isSignUpMode = false">Войдите</a>
         </small>
         <small v-else>
-          Don't have an account yet?
-          <a @click="isSignUpMode = true">Create one for free!</a>
+          Ещё нет аккаунта?
+          <a @click="isSignUpMode = true">Зарегистрируйтесь</a>
         </small>
       </v-card-text>
     </v-form>
@@ -50,6 +51,10 @@ export default {
       errorMessage: "",
       email: "",
       password: "",
+      firstName: "",
+      lastName: "",
+      location: "",
+      kennel: "",
       isSignUpMode: false,
     };
   },
@@ -59,6 +64,10 @@ export default {
         .dispatch("authenticate", {
           email: this.email,
           password: this.password,
+          firstName: this.firstName,
+          lastName: this.lastName,
+          location: this.location,
+          kennel: this.kennel,
           isSignUp,
         })
         .then(() => {

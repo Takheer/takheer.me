@@ -27,10 +27,12 @@
     <v-app-bar :clipped-left="clipped" app>
       <v-toolbar-title v-text="title" />
       <v-spacer />
-      <v-btn v-if="isAuthenticated" color="primary" @click="logOut"
-        >Log out</v-btn
-      >
-      <v-btn v-else color="primary" @click="logIn">Log in</v-btn>
+      <v-btn v-if="isAuthenticated" color="primary" icon @click="openUserPage">
+        <v-icon>mdi-account</v-icon>
+      </v-btn>
+      <v-btn v-else color="primary" icon @click="logIn">
+        <v-icon>mdi-login</v-icon>
+      </v-btn>
     </v-app-bar>
     <v-main>
       <v-container>
@@ -82,6 +84,9 @@ export default {
     isAuthenticated() {
       return this.$store.getters.isAuthenticated;
     },
+    currentUser() {
+      return this.$store.getters.currentUser;
+    },
   },
   methods: {
     logIn() {
@@ -90,6 +95,9 @@ export default {
     logOut() {
       this.$store.dispatch("logout");
       this.$router.push("/admin/auth");
+    },
+    openUserPage() {
+      this.$router.push("/user/" + this.currentUser.firstName);
     },
   },
 };
