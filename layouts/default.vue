@@ -97,7 +97,7 @@ export default {
       this.$router.push("/admin/auth");
     },
     openUserPage() {
-      this.$router.push("/user/" + this.currentUser.firstName);
+      this.$router.push("/me");
     },
   },
 };

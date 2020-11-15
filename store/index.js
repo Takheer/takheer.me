@@ -11,6 +11,7 @@ const createStore = () => {
     state: {
       posts: [],
       token: "",
+      email: "",
       expiry: null,
       currentUser: null,
     },
@@ -135,11 +136,13 @@ const createStore = () => {
           commit("setCurrentUser", user.data());
         }
         localStorage.setItem("token", authResult.idToken);
+        localStorage.setItem("email", authResult.email);
         localStorage.setItem(
           "tokenExpiration",
           new Date().getTime() + +authResult.expiresIn * 1000
         );
         Cookie.set("jwt", authResult.idToken);
+        Cookie.set("email", authResult.email);
         Cookie.set(
           "expirationDate",
           new Date().getTime() + +authResult.expiresIn * 1000
@@ -174,7 +177,6 @@ const createStore = () => {
           expirationDate = localStorage.getItem("tokenExpiration");
         }
         if (new Date().getTime() > +expirationDate || !token) {
-          commit("clearToken");
           dispatch("logout");
           return;
         }
@@ -184,11 +186,18 @@ const createStore = () => {
         commit("clearToken");
         commit("clearCurrentUser");
         Cookie.remove("jwt");
+        Cookie.remove("email");
         Cookie.remove("expirationDate");
         if (process.client) {
           localStorage.removeItem("token");
+          localStorage.removeItem("email");
           localStorage.removeItem("tokenExpiration");
         }
+      },
+      async requestCurrentUser({ commit }) {
+        const email = Cookie.get("email");
+        const user = await db.collection("users").doc(email).get();
+        commit("setCurrentUser", user.data());
       },
     },
   });
