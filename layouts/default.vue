@@ -77,7 +77,7 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: "Takheer.ru",
+      title: "Tollers",
     };
   },
   computed: {

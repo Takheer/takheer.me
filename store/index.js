@@ -132,7 +132,6 @@ const createStore = () => {
         } else {
           user = await db.collection("users").doc(authResult.email).get();
           // eslint-disable-next-line no-console
-          console.log(user.data());
           commit("setCurrentUser", user.data());
         }
         localStorage.setItem("token", authResult.idToken);
