@@ -14,6 +14,7 @@ const createStore = () => {
       email: "",
       expiry: null,
       currentUser: null,
+      isCurrentUserLoaded: false,
     },
     getters: {
       posts(state) {
@@ -55,6 +56,9 @@ const createStore = () => {
       },
       clearCurrentUser(state) {
         state.currentUser = null;
+      },
+      setIsCurrentUserLoaded(state, flag) {
+        state.isCurrentUserLoaded = flag;
       },
     },
     actions: {
@@ -195,9 +199,11 @@ const createStore = () => {
         }
       },
       async requestCurrentUser({ commit }) {
+        commit("setIsCurrentUserLoaded", false);
         const email = Cookie.get("email");
         const user = await db.collection("users").doc(email).get();
         commit("setCurrentUser", user.data());
+        commit("setIsCurrentUserLoaded", true);
       },
     },
   });

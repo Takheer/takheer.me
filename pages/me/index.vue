@@ -1,7 +1,12 @@
 <template>
   <v-container>
-    <v-card>
-      <v-row class="px-8 py-5" align-content="center">
+    <v-card class="d-flex pa-5">
+      <v-progress-circular
+        v-if="!isCurrentUserLoaded"
+        class="ma-auto"
+        indeterminate
+      />
+      <v-row v-else class="px-3" align-content="center">
         <v-avatar color="primary" size="200"></v-avatar>
         <v-col class="pa-0">
           <v-card-title class="pt-0 name-header">
@@ -21,10 +26,11 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 export default {
   name: "Index",
   computed: {
+    ...mapState(["isCurrentUserLoaded"]),
     user() {
       return this.$store.getters.currentUser;
     },
