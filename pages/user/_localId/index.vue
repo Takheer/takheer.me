@@ -48,12 +48,7 @@ export default {
     },
   },
   created() {
-    console.log(this.$route);
-    if (this.$route.params.localId) {
-      this.requestUser(this.$route.params.localId);
-    } else {
-      this.requestCurrentUser();
-    }
+    this.requestUser(this.$route.params.localId);
   },
   methods: {
     ...mapActions(["requestCurrentUser", "requestUser"]),

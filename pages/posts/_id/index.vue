@@ -8,7 +8,7 @@
         </p>
         <p>
           <nuxt-link :to="{ path: `/user/${post.authorId}` }">
-            {{ post.authorId }}
+            {{ user.firstName }} {{ user.lastName }}
           </nuxt-link>
         </p>
       </v-card-text>
@@ -17,14 +17,18 @@
 </template>
 
 <script>
+import db from "../../../db/db";
+
 export default {
   name: "Index",
   async asyncData(context) {
-    const data = await context.app.$axios.$get(
+    const post = await context.app.$axios.$get(
       "posts/" + context.params.id + ".json"
     );
-    data.text = data.text.split("\n\n");
-    return { post: data };
+    post.text = post.text.split("\n\n");
+
+    const userRaw = await db.collection("users").doc(post.authorId).get();
+    return { post, user: userRaw.data() };
   },
 };
 </script>
