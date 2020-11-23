@@ -11,7 +11,7 @@ const createStore = () => {
     state: {
       posts: [],
       token: "",
-      email: "",
+      localId: "",
       expiry: null,
       currentUser: null,
       isCurrentUserLoaded: false,
@@ -112,13 +112,6 @@ const createStore = () => {
           password: authData.password,
           returnSecureToken: true,
         };
-        const userData = {
-          firstName: authData.firstName,
-          lastName: authData.lastName,
-          location: authData.location,
-          kennel: authData.kennel,
-          moderated: false,
-        };
         const authResult = await this.$axios.$post(
           "https://identitytoolkit.googleapis.com/v1/accounts:" +
             method +
@@ -126,27 +119,37 @@ const createStore = () => {
             firebaseConfig.apiKey,
           data
         );
+        // eslint-disable-next-line no-console
+        console.log("authResult", authResult);
+        const userData = {
+          firstName: authData.firstName,
+          lastName: authData.lastName,
+          location: authData.location,
+          kennel: authData.kennel,
+          email: authResult.email,
+          moderated: false,
+        };
         commit("setToken", authResult.idToken);
         let user;
         if (authData.isSignUp) {
           user = await db
             .collection("users")
-            .doc(authResult.email)
+            .doc(authResult.localId)
             .set(userData);
           commit("setCurrentUser", userData);
         } else {
-          user = await db.collection("users").doc(authResult.email).get();
+          user = await db.collection("users").doc(authResult.localId).get();
           // eslint-disable-next-line no-console
           commit("setCurrentUser", user.data());
         }
         localStorage.setItem("token", authResult.idToken);
-        localStorage.setItem("email", authResult.email);
+        localStorage.setItem("localId", authResult.localId);
         localStorage.setItem(
           "tokenExpiration",
           new Date().getTime() + +authResult.expiresIn * 1000
         );
         Cookie.set("jwt", authResult.idToken);
-        Cookie.set("email", authResult.email);
+        Cookie.set("localId", authResult.localId);
         Cookie.set(
           "expirationDate",
           new Date().getTime() + +authResult.expiresIn * 1000
@@ -190,18 +193,18 @@ const createStore = () => {
         commit("clearToken");
         commit("clearCurrentUser");
         Cookie.remove("jwt");
-        Cookie.remove("email");
+        Cookie.remove("localId");
         Cookie.remove("expirationDate");
         if (process.client) {
           localStorage.removeItem("token");
-          localStorage.removeItem("email");
+          localStorage.removeItem("localId");
           localStorage.removeItem("tokenExpiration");
         }
       },
       async requestCurrentUser({ commit }) {
         commit("setIsCurrentUserLoaded", false);
-        const email = Cookie.get("email");
-        const user = await db.collection("users").doc(email).get();
+        const localId = Cookie.get("localId");
+        const user = await db.collection("users").doc(localId).get();
         commit("setCurrentUser", user.data());
         commit("setIsCurrentUserLoaded", true);
       },
