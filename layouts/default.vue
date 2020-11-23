@@ -46,6 +46,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from "vuex";
 export default {
   data() {
     return {
@@ -81,12 +82,8 @@ export default {
     };
   },
   computed: {
-    isAuthenticated() {
-      return this.$store.getters.isAuthenticated;
-    },
-    currentUser() {
-      return this.$store.getters.currentUser;
-    },
+    ...mapState(["currentUser", "localId"]),
+    ...mapGetters(["isAuthenticated"]),
   },
   methods: {
     logIn() {
@@ -97,7 +94,7 @@ export default {
       this.$router.push("/admin/auth");
     },
     openUserPage() {
-      this.$router.push("/me");
+      this.$router.push(`/user/${this.$store.getters.currentUserId}`);
     },
   },
 };

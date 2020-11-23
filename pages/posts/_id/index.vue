@@ -6,6 +6,11 @@
         <p v-for="paragraph of post.text" :key="paragraph" class="post-body">
           {{ paragraph }}
         </p>
+        <p>
+          <nuxt-link :to="{ path: `/user/${post.authorId}` }">
+            {{ post.authorId }}
+          </nuxt-link>
+        </p>
       </v-card-text>
     </v-card>
   </v-container>

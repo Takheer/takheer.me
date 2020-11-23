@@ -26,6 +26,9 @@ const createStore = () => {
       currentUser(state) {
         return state.currentUser;
       },
+      currentUserId(state) {
+        return state.localId;
+      },
     },
     mutations: {
       setPosts(state, posts) {
@@ -154,6 +157,8 @@ const createStore = () => {
           "expirationDate",
           new Date().getTime() + +authResult.expiresIn * 1000
         );
+        // eslint-disable-next-line no-console
+        console.log("localId is set");
         // .catch((e) => {
         //   if (e.message === "EMAIL_EXISTS") {
         //     dispatch("authenticate", { ...authData, isSignUp: false });
@@ -205,6 +210,12 @@ const createStore = () => {
         commit("setIsCurrentUserLoaded", false);
         const localId = Cookie.get("localId");
         const user = await db.collection("users").doc(localId).get();
+        commit("setCurrentUser", user.data());
+        commit("setIsCurrentUserLoaded", true);
+      },
+      async requestUser({ commit }, id) {
+        commit("setIsCurrentUserLoaded", false);
+        const user = await db.collection("users").doc(id).get();
         commit("setCurrentUser", user.data());
         commit("setIsCurrentUserLoaded", true);
       },
